@@ -2,77 +2,59 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"flag"
 	"fmt"
+	"go/ast"
+	"go/printer"
+	"go/token"
 	"io/ioutil"
 	"os"
-	"reflect"
-	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/kr/pretty"
 )
 
-var Env map[string]interface{}
-var ClassRules map[string]*regexp.Regexp
-var Debug bool
-var File string
-
-func init() {
-	Env = map[string]interface{}{
-		"+":      SUM,
-		"-":      SUB,
-		"*":      MUL,
-		"/":      DIV,
-		"%":      MOD,
-		"==":     ISEQ,
-		">":      ISGT,
-		">=":     ISGTEQ,
-		"<":      ISLT,
-		"<=":     ISLTEQ,
-		"if":     IF,
-		"print":  PRINT,
-		"def":    DEF,
-		"repeat": REPEAT,
-	}
-
-	ClassRules = map[string]*regexp.Regexp{
-		"int64": regexp.MustCompile(`^[0-9]+$`),
-		"bool":  regexp.MustCompile(`^(true|false)$`),
-	}
+type Node struct {
+	Atom  string
+	Nodes []Node
 }
 
 func main() {
-	flag.StringVar(&File, "file", "", "Path to file")
-	flag.BoolVar(&Debug, "debug", false, "Debug mode")
+	var debug bool
+	var file string
+
+	flag.StringVar(&file, "file", "", "Path to file")
+	flag.BoolVar(&debug, "debug", false, "Debug mode")
 
 	flag.Parse()
 
-	if File == "" {
+	if file == "" {
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
 
-	src, err := ioutil.ReadFile(File)
-
-	check_error(err)
+	src, _ := ioutil.ReadFile(file)
 
 	tokens := tokenize(string(src))
-	ast, _ := parse(tokens)
+	yalAST, _ := parse(tokens)
 
-	if Debug {
-		fmt.Printf("%# v\n\n", pretty.Formatter(ast))
+	if debug {
+		fmt.Printf("%# v\n\n", pretty.Formatter(yalAST))
 	}
 
-	result := eval(ast)
+	fset := token.NewFileSet()
 
-	fmt.Println(result)
-}
+	mainFile := &ast.File{
+		Name:  ast.NewIdent("main"),
+		Decls: evalFile(yalAST),
+		Scope: &ast.Scope{},
+	}
 
-type Node struct {
-	atom  string
-	nodes []Node
+	pckg, _ := ast.NewPackage(fset, map[string]*ast.File{"main": mainFile}, nil, nil)
+
+	out, _ := GenerateFile(fset, pckg.Files["main"])
+	fmt.Println(string(out))
 }
 
 func tokenize(src string) []string {
@@ -88,8 +70,9 @@ func tokenize(src string) []string {
 		char, _, err = reader.ReadRune()
 
 		if inString {
-			if isQUOTE(char) {
+			if isQuote(char) {
 				inString = false
+				atom = append(atom, char)
 				tokens = append(tokens, string(atom))
 				atom = atom[:0]
 			} else {
@@ -100,18 +83,17 @@ func tokenize(src string) []string {
 		}
 
 		switch {
-		case isLPAR(char):
+		case isLParen(char):
 			tokens = append(tokens, string(char))
-		case isRPAR(char):
+		case isRParen(char):
 			applyAtom(&tokens, &atom)
 			tokens = append(tokens, string(char))
-		case isLITERAL(char):
+		case isLiteral(char):
 			atom = append(atom, char)
-		case isINTEGER(char):
-			atom = append(atom, char)
-		case isQUOTE(char):
+		case isQuote(char):
 			inString = true
-		case isWHITESPACE(char):
+			atom = append(atom, char)
+		case isWhitespace(char):
 			applyAtom(&tokens, &atom)
 		}
 	}
@@ -119,28 +101,26 @@ func tokenize(src string) []string {
 	return tokens
 }
 
-func isLPAR(r rune) bool {
+func isLParen(r rune) bool {
 	return r == '('
 }
 
-func isRPAR(r rune) bool {
+func isRParen(r rune) bool {
 	return r == ')'
 }
 
-func isWHITESPACE(r rune) bool {
+func isWhitespace(r rune) bool {
 	return r == ' ' || r == '\n'
 }
 
-func isQUOTE(r rune) bool {
+func isQuote(r rune) bool {
 	return r == '"'
 }
 
-func isINTEGER(r rune) bool {
-	return r >= '0' && r <= '9'
-}
-
-func isLITERAL(r rune) bool {
-	return (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || r == '=' || r == '%'
+func isLiteral(r rune) bool {
+	return (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9') ||
+		r == '%' || r == '+' || r == '-' || r == '/' || r == '*' ||
+		r == '=' || r == '>' || r == '<' || r == '.'
 }
 
 func applyAtom(tokens *[]string, atom *[]rune) {
@@ -162,15 +142,15 @@ func parse(tokens []string) (Node, int) {
 
 		if token == "(" {
 			tmp, move := parse(tokens[i+1:])
-			node.nodes = append(node.nodes, tmp)
+			node.Nodes = append(node.Nodes, tmp)
 			i += move + 1
 		} else if token == ")" {
 			return node, i
-		} else if inEnv(token) {
-			node.atom = token
+		} else if node.Atom == "" {
+			node.Atom = token
 		} else {
-			var valueNode = Node{atom: token}
-			node.nodes = append(node.nodes, valueNode)
+			var valueNode = Node{Atom: token}
+			node.Nodes = append(node.Nodes, valueNode)
 		}
 
 		i++
@@ -179,66 +159,67 @@ func parse(tokens []string) (Node, int) {
 	return node, size
 }
 
-func eval(node Node) interface{} {
-	if node.atom == "" {
-		var result interface{}
+func evalFile(node Node) []ast.Decl {
+	var result []ast.Decl
 
-		for _, n := range node.nodes {
-			result = eval(n)
-		}
+	for _, n := range node.Nodes {
+		result = append(result, evalFunc(n))
+	}
 
-		return result
+	return result
+}
+
+func evalFunc(node Node) ast.Decl {
+	var bodyList []ast.Stmt
+
+	for _, n := range node.Nodes[1:] {
+		bodyList = append(bodyList, evalStmt(n))
+	}
+
+	result := &ast.FuncDecl{
+		Name: ast.NewIdent(node.Nodes[0].Atom),
+		Type: &ast.FuncType{},
+		Body: &ast.BlockStmt{
+			List: bodyList,
+		},
+	}
+
+	return result
+}
+
+func evalStmt(node Node) ast.Stmt {
+	return &ast.ExprStmt{X: evalExpr(node)}
+}
+
+func evalExpr(node Node) ast.Expr {
+	if len(node.Nodes) == 0 {
+		return &ast.BasicLit{Value: node.Atom}
+	} else if isCoreFun(node.Atom) {
+		return coreFuns[node.Atom].(func(node Node) ast.Expr)(node)
 	} else {
-		if inEnv(node.atom) {
-			if reflect.TypeOf(Env[node.atom]).String() == "main.Node" {
-				return eval(Env[node.atom].(Node))
-			} else {
-				return Env[node.atom].(func(node Node) interface{})(node)
-			}
-		} else {
-			return parseAtom(node)
+		var args []ast.Expr
+
+		for _, n := range node.Nodes {
+			args = append(args, evalExpr(n))
 		}
-	}
-}
 
-func parseAtom(node Node) interface{} {
-	var class string
-
-	for k, regexp := range ClassRules {
-		if regexp.MatchString(node.atom) {
-			class = k
-			break
+		e := &ast.CallExpr{
+			Fun:  ast.NewIdent(node.Atom),
+			Args: args,
 		}
-	}
 
-	switch class {
-	case "int64":
-		var _value int64
-		_value, _ = strconv.ParseInt(node.atom, 10, 64)
-		return _value
-	case "bool":
-		var _value bool
-		_value, _ = strconv.ParseBool(node.atom)
-		return _value
-	default:
-		return node.atom
+		return e
 	}
 }
 
-func inEnv(atom string) bool {
-	_, ok := Env[atom]
+func GenerateFile(fset *token.FileSet, file *ast.File) ([]byte, error) {
+	var output []byte
 
-	return ok
-}
+	buffer := bytes.NewBuffer(output)
 
-func check_arity(node Node, arity int) {
-	if len(node.nodes) != arity {
-		panic("Wrong number of arguments")
+	if err := printer.Fprint(buffer, fset, file); err != nil {
+		return nil, err
 	}
-}
 
-func check_error(e error) {
-	if e != nil {
-		panic(e)
-	}
+	return buffer.Bytes(), nil
 }

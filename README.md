@@ -1,132 +1,36 @@
 # Yal
 
-Yet another Lisp.
+Yet another Lisp [transpiler](https://en.wikipedia.org/wiki/Source-to-source_compiler) to Go source code.
 
 [![GoDoc](https://godoc.org/github.com/droptheplot/yal?status.svg)](https://godoc.org/github.com/droptheplot/yal)
 [![Go Report Card](https://goreportcard.com/badge/github.com/droptheplot/yal)](https://goreportcard.com/report/github.com/droptheplot/yal)
 
-# Usage
+## Usage
 
 ```shell
 git clone https://github.com/droptheplot/yal
 cd yal
 go build
-./yal -file=hello.yal
+./yal -file hello.yal
 ```
 
-# Functions
+## Example
 
-* [Core](#core)
-* [Integer](#integer)
+### Input
 
-## Core
-
-### `==`
-
-```lisp
-(== 2 2)
-;; true
-
-(== "hello" "world")
-;; false
+```clojure
+(func main
+    (fmt.Print "2 + 2 =")
+    (fmt.Println (+ 2 2)))
 ```
 
-### `if`
+### Output
 
-```lisp
-(if (== 2 4)
-    (print "true")
-    (print "false"))
-;; nil
+```go
+package main
 
-(if (== 2 2)
-    (print "equal"))
-;; nil
-```
-
-### `print`
-
-```lisp
-(print "hello world")
-;; nil
-```
-
-### `def`
-
-```lisp
-(def my_var 5)
-;; nil
-```
-
-### `repeat`
-
-```lisp
-(repeat n 5
-  (print n))
-;; nil
-```
-
-## Integer
-
-### `+`
-
-```lisp
-(+ 2 2)
-;; 4
-```
-
-### `-`
-
-```lisp
-(- 10 5)
-;; 5
-```
-
-### `*`
-
-```lisp
-(* 2 2)
-;; 4
-```
-
-### `/`
-
-```lisp
-(/ 10 5)
-;; 2
-```
-
-### `%`
-
-```lisp
-(% 3 2)
-;; 1
-```
-
-### `>`
-
-```lisp
-(> 10 5)
-;; true
-```
-
-### `>=`
-
-```lisp
-(>= 10 5)
-;; true
-```
-
-### `<`
-
-```lisp
-(< 10 5)
-;; false
-```
-
-### `<=`
-
-```lisp
-(<= 10 5)
-;; false
+func main() {
+    fmt.Print("2 + 2 = ")
+    fmt.Println(2+2)
+}
 ```
