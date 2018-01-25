@@ -172,19 +172,44 @@ func evalFile(node Node) []ast.Decl {
 func evalFunc(node Node) ast.Decl {
 	var bodyList []ast.Stmt
 
-	for _, n := range node.Nodes[1:] {
+	for _, n := range node.Nodes[3:] {
 		bodyList = append(bodyList, evalStmt(n))
 	}
 
 	result := &ast.FuncDecl{
 		Name: ast.NewIdent(node.Nodes[0].Atom),
-		Type: &ast.FuncType{},
+		Type: &ast.FuncType{
+			Params:  evalFieldList(node.Nodes[1]),
+			Results: evalFieldList(node.Nodes[2]),
+		},
 		Body: &ast.BlockStmt{
 			List: bodyList,
 		},
 	}
 
 	return result
+}
+
+func evalFieldList(node Node) *ast.FieldList {
+	var list []*ast.Field
+
+	if node.Atom == "" {
+		for _, n := range node.Nodes {
+			list = append(list, evalField(n))
+		}
+	} else {
+		list = append(list, evalField(node))
+	}
+
+	return &ast.FieldList{List: list}
+}
+
+func evalField(node Node) *ast.Field {
+	if len(node.Nodes) == 0 {
+		return &ast.Field{Type: ast.NewIdent(node.Atom)}
+	}
+
+	return &ast.Field{Names: []*ast.Ident{ast.NewIdent(node.Atom)}, Type: ast.NewIdent(node.Nodes[0].Atom)}
 }
 
 func evalStmt(node Node) ast.Stmt {

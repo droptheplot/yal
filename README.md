@@ -19,9 +19,11 @@ go build
 ### Input
 
 ```clojure
-(func main
-    (fmt.Print "2 + 2 =")
-    (fmt.Println (+ 2 2)))
+(func main () ()
+  (fmt.Println (mul 2 3)))
+
+(func mul ((a int) (b int)) (int)
+  (return (* a b)))
 ```
 
 ### Output
@@ -30,7 +32,10 @@ go build
 package main
 
 func main() {
-    fmt.Print("2 + 2 = ")
-    fmt.Println(2+2)
+	fmt.Println(mul(2, 3))
+}
+
+func mul(a int, b int) int {
+	return(a * b)
 }
 ```
