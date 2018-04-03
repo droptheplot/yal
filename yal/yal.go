@@ -5,6 +5,25 @@ import (
 	"strings"
 )
 
+var literals []rune
+
+func init() {
+	literals = []rune{'%', '+', '-', '/', '*', '=', '>', '<', '.', '|', '!', '&'}
+	var i rune
+
+	for i = 'a'; i <= 'z'; i++ {
+		literals = append(literals, i)
+	}
+
+	for i = 'A'; i <= 'Z'; i++ {
+		literals = append(literals, i)
+	}
+
+	for i = '0'; i <= '9'; i++ {
+		literals = append(literals, i)
+	}
+}
+
 type Node struct {
 	Atom  string
 	Nodes []Node
@@ -107,9 +126,13 @@ func isQuote(r rune) bool {
 }
 
 func isLiteral(r rune) bool {
-	return (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9') ||
-		r == '%' || r == '+' || r == '-' || r == '/' || r == '*' ||
-		r == '=' || r == '>' || r == '<' || r == '.'
+	for i, _ := range literals {
+		if literals[i] == r {
+			return true
+		}
+	}
+
+	return false
 }
 
 func applyAtom(tokens *[]string, atom *[]rune) {
