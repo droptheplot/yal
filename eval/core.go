@@ -24,6 +24,7 @@ func init() {
 		"<":  LSS,
 		"<=": LEQ,
 		"||": LOR,
+		"&&": LAND,
 	}
 
 	coreStmts = map[string]func(yal.Node) ast.Stmt{
@@ -138,6 +139,14 @@ func LOR(node yal.Node) ast.Expr {
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.LOR,
+	}
+}
+
+func LAND(node yal.Node) ast.Expr {
+	return &ast.BinaryExpr{
+		X:  Expr(node.Nodes[0]),
+		Y:  Expr(node.Nodes[1]),
+		Op: token.LAND,
 	}
 }
 
