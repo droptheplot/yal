@@ -7,25 +7,38 @@ import (
 	"github.com/droptheplot/yal/yal"
 )
 
-var coreFuncs map[string]interface{}
+var coreExprs map[string]func(yal.Node) ast.Expr
+var coreStmts map[string]func(yal.Node) ast.Stmt
 
 func init() {
-	coreFuncs = map[string]interface{}{
+	coreExprs = map[string]func(yal.Node) ast.Expr{
 		"+":  ADD,
 		"-":  SUB,
 		"*":  MUL,
 		"/":  QUO,
 		"%":  REM,
 		"==": EQL,
+		"!=": NEQ,
 		">":  GTR,
 		">=": GEQ,
 		"<":  LSS,
 		"<=": LEQ,
+		"||": LOR,
+	}
+
+	coreStmts = map[string]func(yal.Node) ast.Stmt{
+		"if": IF,
 	}
 }
 
-func isCoreFunc(atom string) bool {
-	_, ok := coreFuncs[atom]
+func isCoreExpr(node yal.Node) bool {
+	_, ok := coreExprs[node.Atom]
+
+	return ok
+}
+
+func isCoreStmt(node yal.Node) bool {
+	_, ok := coreStmts[node.Atom]
 
 	return ok
 }
@@ -41,89 +54,98 @@ func ADD(node yal.Node) ast.Expr {
 }
 
 func SUB(node yal.Node) ast.Expr {
-	e := &ast.BinaryExpr{
+	return &ast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.SUB,
 	}
-
-	return e
 }
 
 func MUL(node yal.Node) ast.Expr {
-	e := &ast.BinaryExpr{
+	return &ast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.MUL,
 	}
-
-	return e
 }
 
 func QUO(node yal.Node) ast.Expr {
-	e := &ast.BinaryExpr{
+	return &ast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.QUO,
 	}
-
-	return e
 }
+
 func REM(node yal.Node) ast.Expr {
-	e := &ast.BinaryExpr{
+	return &ast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.REM,
 	}
-
-	return e
 }
+
 func EQL(node yal.Node) ast.Expr {
-	e := &ast.BinaryExpr{
+	return &ast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.EQL,
 	}
+}
 
-	return e
+func NEQ(node yal.Node) ast.Expr {
+	return &ast.BinaryExpr{
+		X:  Expr(node.Nodes[0]),
+		Y:  Expr(node.Nodes[1]),
+		Op: token.NEQ,
+	}
 }
 
 func GTR(node yal.Node) ast.Expr {
-	e := &ast.BinaryExpr{
+	return &ast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.GTR,
 	}
-
-	return e
 }
 
 func GEQ(node yal.Node) ast.Expr {
-	e := &ast.BinaryExpr{
+	return &ast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.GEQ,
 	}
-
-	return e
 }
 
 func LSS(node yal.Node) ast.Expr {
-	e := &ast.BinaryExpr{
+	return &ast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.LSS,
 	}
-
-	return e
 }
 
 func LEQ(node yal.Node) ast.Expr {
-	e := &ast.BinaryExpr{
+	return &ast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.LEQ,
 	}
+}
 
-	return e
+func LOR(node yal.Node) ast.Expr {
+	return &ast.BinaryExpr{
+		X:  Expr(node.Nodes[0]),
+		Y:  Expr(node.Nodes[1]),
+		Op: token.LOR,
+	}
+}
+
+func IF(node yal.Node) ast.Stmt {
+	return &ast.IfStmt{
+		Cond: Expr(node.Nodes[0]),
+		Body: &ast.BlockStmt{
+			List: []ast.Stmt{Stmt(node.Nodes[1])},
+		},
+	}
 }

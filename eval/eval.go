@@ -60,14 +60,18 @@ func Field(node yal.Node) *ast.Field {
 }
 
 func Stmt(node yal.Node) ast.Stmt {
-	return &ast.ExprStmt{X: Expr(node)}
+	if isCoreStmt(node) {
+		return coreStmts[node.Atom](node)
+	} else {
+		return &ast.ExprStmt{X: Expr(node)}
+	}
 }
 
 func Expr(node yal.Node) ast.Expr {
 	if len(node.Nodes) == 0 {
 		return &ast.BasicLit{Value: node.Atom}
-	} else if isCoreFunc(node.Atom) {
-		return coreFuncs[node.Atom].(func(node yal.Node) ast.Expr)(node)
+	} else if isCoreExpr(node) {
+		return coreExprs[node.Atom](node)
 	} else {
 		var args []ast.Expr
 
