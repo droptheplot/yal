@@ -41,7 +41,7 @@ func main() {
 	fset := token.NewFileSet()
 
 	mainFile := &ast.File{
-		Name:  ast.NewIdent("main"),
+		Name:  core.Name(y),
 		Decls: core.File(y),
 		Scope: &ast.Scope{},
 	}

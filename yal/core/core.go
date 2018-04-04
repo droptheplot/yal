@@ -43,11 +43,21 @@ func isStmt(node yal.Node) bool {
 	return ok
 }
 
+func isFunc(node yal.Node) bool {
+	return node.Atom == "func"
+}
+
+func isPackage(node yal.Node) bool {
+	return node.Atom == "package"
+}
+
 func File(node yal.Node) []ast.Decl {
 	var result []ast.Decl
 
 	for _, n := range node.Nodes {
-		result = append(result, Func(n))
+		if isFunc(n) {
+			result = append(result, Func(n))
+		}
 	}
 
 	return result
@@ -123,4 +133,16 @@ func Expr(node yal.Node) ast.Expr {
 
 		return e
 	}
+}
+
+func Name(node yal.Node) *ast.Ident {
+	var name string
+
+	for _, n := range node.Nodes {
+		if isPackage(n) {
+			name = n.Nodes[0].Atom
+		}
+	}
+
+	return ast.NewIdent(name)
 }
