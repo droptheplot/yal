@@ -10,8 +10,8 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/droptheplot/yal/eval"
 	"github.com/droptheplot/yal/yal"
+	"github.com/droptheplot/yal/yal/core"
 
 	"github.com/kr/pretty"
 )
@@ -42,7 +42,7 @@ func main() {
 
 	mainFile := &ast.File{
 		Name:  ast.NewIdent("main"),
-		Decls: eval.File(y),
+		Decls: core.File(y),
 		Scope: &ast.Scope{},
 	}
 

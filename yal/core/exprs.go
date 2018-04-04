@@ -1,4 +1,4 @@
-package eval
+package core
 
 import (
 	"go/ast"
@@ -6,43 +6,6 @@ import (
 
 	"github.com/droptheplot/yal/yal"
 )
-
-var coreExprs map[string]func(yal.Node) ast.Expr
-var coreStmts map[string]func(yal.Node) ast.Stmt
-
-func init() {
-	coreExprs = map[string]func(yal.Node) ast.Expr{
-		"+":  ADD,
-		"-":  SUB,
-		"*":  MUL,
-		"/":  QUO,
-		"%":  REM,
-		"==": EQL,
-		"!=": NEQ,
-		">":  GTR,
-		">=": GEQ,
-		"<":  LSS,
-		"<=": LEQ,
-		"||": LOR,
-		"&&": LAND,
-	}
-
-	coreStmts = map[string]func(yal.Node) ast.Stmt{
-		"if": IF,
-	}
-}
-
-func isCoreExpr(node yal.Node) bool {
-	_, ok := coreExprs[node.Atom]
-
-	return ok
-}
-
-func isCoreStmt(node yal.Node) bool {
-	_, ok := coreStmts[node.Atom]
-
-	return ok
-}
 
 func ADD(node yal.Node) ast.Expr {
 	e := &ast.BinaryExpr{
@@ -147,14 +110,5 @@ func LAND(node yal.Node) ast.Expr {
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.LAND,
-	}
-}
-
-func IF(node yal.Node) ast.Stmt {
-	return &ast.IfStmt{
-		Cond: Expr(node.Nodes[0]),
-		Body: &ast.BlockStmt{
-			List: []ast.Stmt{Stmt(node.Nodes[1])},
-		},
 	}
 }

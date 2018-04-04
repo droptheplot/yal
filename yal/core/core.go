@@ -1,10 +1,47 @@
-package eval
+package core
 
 import (
 	"go/ast"
 
 	"github.com/droptheplot/yal/yal"
 )
+
+var Exprs map[string]func(yal.Node) ast.Expr
+var Stmts map[string]func(yal.Node) ast.Stmt
+
+func init() {
+	Exprs = map[string]func(yal.Node) ast.Expr{
+		"+":  ADD,
+		"-":  SUB,
+		"*":  MUL,
+		"/":  QUO,
+		"%":  REM,
+		"==": EQL,
+		"!=": NEQ,
+		">":  GTR,
+		">=": GEQ,
+		"<":  LSS,
+		"<=": LEQ,
+		"||": LOR,
+		"&&": LAND,
+	}
+
+	Stmts = map[string]func(yal.Node) ast.Stmt{
+		"if": IF,
+	}
+}
+
+func isExpr(node yal.Node) bool {
+	_, ok := Exprs[node.Atom]
+
+	return ok
+}
+
+func isStmt(node yal.Node) bool {
+	_, ok := Stmts[node.Atom]
+
+	return ok
+}
 
 func File(node yal.Node) []ast.Decl {
 	var result []ast.Decl
@@ -60,8 +97,8 @@ func Field(node yal.Node) *ast.Field {
 }
 
 func Stmt(node yal.Node) ast.Stmt {
-	if isCoreStmt(node) {
-		return coreStmts[node.Atom](node)
+	if isStmt(node) {
+		return Stmts[node.Atom](node)
 	} else {
 		return &ast.ExprStmt{X: Expr(node)}
 	}
@@ -70,8 +107,8 @@ func Stmt(node yal.Node) ast.Stmt {
 func Expr(node yal.Node) ast.Expr {
 	if len(node.Nodes) == 0 {
 		return &ast.BasicLit{Value: node.Atom}
-	} else if isCoreExpr(node) {
-		return coreExprs[node.Atom](node)
+	} else if isExpr(node) {
+		return Exprs[node.Atom](node)
 	} else {
 		var args []ast.Expr
 
