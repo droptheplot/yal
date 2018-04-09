@@ -27,7 +27,10 @@ func init() {
 	}
 
 	Stmts = map[string]func(yal.Node) ast.Stmt{
-		"if": IF,
+		"if":     IF,
+		"var":    VAR,
+		"return": RETURN,
+		"=":      ASSIGN,
 	}
 }
 
