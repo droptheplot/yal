@@ -8,7 +8,7 @@ import (
 var literals []rune
 
 func init() {
-	literals = []rune{'%', '+', '-', '/', '*', '=', '>', '<', '.', '|', '!', '&'}
+	literals = []rune{'%', '+', '-', '/', '*', '=', '>', '<', '.', '|', '!', '&', '[', ']'}
 	var i rune
 
 	for i = 'a'; i <= 'z'; i++ {
