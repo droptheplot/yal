@@ -1,16 +1,16 @@
 package core
 
 import (
-	"go/ast"
+	goast "go/ast"
 
-	"github.com/droptheplot/yal/yal"
+	"github.com/droptheplot/yal/yal/ast"
 )
 
-var Exprs map[string]func(yal.Node) ast.Expr
-var Stmts map[string]func(yal.Node) ast.Stmt
+var Exprs map[string]func(ast.Node) goast.Expr
+var Stmts map[string]func(ast.Node) goast.Stmt
 
 func init() {
-	Exprs = map[string]func(yal.Node) ast.Expr{
+	Exprs = map[string]func(ast.Node) goast.Expr{
 		"+":  ADD,
 		"-":  SUB,
 		"*":  MUL,
@@ -26,7 +26,7 @@ func init() {
 		"&&": LAND,
 	}
 
-	Stmts = map[string]func(yal.Node) ast.Stmt{
+	Stmts = map[string]func(ast.Node) goast.Stmt{
 		"if":     IF,
 		"var":    VAR,
 		"return": RETURN,
@@ -35,56 +35,63 @@ func init() {
 	}
 }
 
-func isExpr(node yal.Node) bool {
+func isExpr(node ast.Node) bool {
 	_, ok := Exprs[node.Atom]
 
 	return ok
 }
 
-func isStmt(node yal.Node) bool {
+func isStmt(node ast.Node) bool {
 	_, ok := Stmts[node.Atom]
 
 	return ok
 }
 
-func isFunc(node yal.Node) bool {
+func isFunc(node ast.Node) bool {
 	return node.Atom == "func"
 }
 
-func isPackage(node yal.Node) bool {
+func isPackage(node ast.Node) bool {
 	return node.Atom == "package"
 }
 
-func isDefault(node yal.Node) bool {
+func isDefault(node ast.Node) bool {
 	return node.Atom == "default"
 }
 
-func File(node yal.Node) []ast.Decl {
-	var result []ast.Decl
+func File(node ast.Node) *goast.File {
+	var name *goast.Ident
+	var decls []goast.Decl
 
 	for _, n := range node.Nodes {
 		if isFunc(n) {
-			result = append(result, Func(n))
+			decls = append(decls, Func(n))
+		} else if isPackage(n) {
+			name = goast.NewIdent(n.Nodes[0].Atom)
 		}
 	}
 
-	return result
+	return &goast.File{
+		Name:  name,
+		Decls: decls,
+		Scope: &goast.Scope{},
+	}
 }
 
-func Func(node yal.Node) ast.Decl {
-	var bodyList []ast.Stmt
+func Func(node ast.Node) goast.Decl {
+	var bodyList []goast.Stmt
 
 	for _, n := range node.Nodes[3:] {
 		bodyList = append(bodyList, Stmt(n))
 	}
 
-	result := &ast.FuncDecl{
-		Name: ast.NewIdent(node.Nodes[0].Atom),
-		Type: &ast.FuncType{
+	result := &goast.FuncDecl{
+		Name: goast.NewIdent(node.Nodes[0].Atom),
+		Type: &goast.FuncType{
 			Params:  FieldList(node.Nodes[1]),
 			Results: FieldList(node.Nodes[2]),
 		},
-		Body: &ast.BlockStmt{
+		Body: &goast.BlockStmt{
 			List: bodyList,
 		},
 	}
@@ -92,8 +99,8 @@ func Func(node yal.Node) ast.Decl {
 	return result
 }
 
-func FieldList(node yal.Node) *ast.FieldList {
-	var list []*ast.Field
+func FieldList(node ast.Node) *goast.FieldList {
+	var list []*goast.Field
 
 	if node.Atom == "" {
 		for _, n := range node.Nodes {
@@ -103,54 +110,42 @@ func FieldList(node yal.Node) *ast.FieldList {
 		list = append(list, Field(node))
 	}
 
-	return &ast.FieldList{List: list}
+	return &goast.FieldList{List: list}
 }
 
-func Field(node yal.Node) *ast.Field {
+func Field(node ast.Node) *goast.Field {
 	if len(node.Nodes) == 0 {
-		return &ast.Field{Type: ast.NewIdent(node.Atom)}
+		return &goast.Field{Type: goast.NewIdent(node.Atom)}
 	}
 
-	return &ast.Field{Names: []*ast.Ident{ast.NewIdent(node.Atom)}, Type: ast.NewIdent(node.Nodes[0].Atom)}
+	return &goast.Field{Names: []*goast.Ident{goast.NewIdent(node.Atom)}, Type: goast.NewIdent(node.Nodes[0].Atom)}
 }
 
-func Stmt(node yal.Node) ast.Stmt {
+func Stmt(node ast.Node) goast.Stmt {
 	if isStmt(node) {
 		return Stmts[node.Atom](node)
 	} else {
-		return &ast.ExprStmt{X: Expr(node)}
+		return &goast.ExprStmt{X: Expr(node)}
 	}
 }
 
-func Expr(node yal.Node) ast.Expr {
+func Expr(node ast.Node) goast.Expr {
 	if len(node.Nodes) == 0 {
-		return &ast.BasicLit{Value: node.Atom}
+		return &goast.BasicLit{Value: node.Atom}
 	} else if isExpr(node) {
 		return Exprs[node.Atom](node)
 	} else {
-		var args []ast.Expr
+		var args []goast.Expr
 
 		for _, n := range node.Nodes {
 			args = append(args, Expr(n))
 		}
 
-		e := &ast.CallExpr{
-			Fun:  ast.NewIdent(node.Atom),
+		e := &goast.CallExpr{
+			Fun:  goast.NewIdent(node.Atom),
 			Args: args,
 		}
 
 		return e
 	}
-}
-
-func Name(node yal.Node) *ast.Ident {
-	var name string
-
-	for _, n := range node.Nodes {
-		if isPackage(n) {
-			name = n.Nodes[0].Atom
-		}
-	}
-
-	return ast.NewIdent(name)
 }

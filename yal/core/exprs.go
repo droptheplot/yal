@@ -1,14 +1,14 @@
 package core
 
 import (
-	"go/ast"
+	goast "go/ast"
 	"go/token"
 
-	"github.com/droptheplot/yal/yal"
+	"github.com/droptheplot/yal/yal/ast"
 )
 
-func ADD(node yal.Node) ast.Expr {
-	e := &ast.BinaryExpr{
+func ADD(node ast.Node) goast.Expr {
+	e := &goast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.ADD,
@@ -17,96 +17,96 @@ func ADD(node yal.Node) ast.Expr {
 	return e
 }
 
-func SUB(node yal.Node) ast.Expr {
-	return &ast.BinaryExpr{
+func SUB(node ast.Node) goast.Expr {
+	return &goast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.SUB,
 	}
 }
 
-func MUL(node yal.Node) ast.Expr {
-	return &ast.BinaryExpr{
+func MUL(node ast.Node) goast.Expr {
+	return &goast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.MUL,
 	}
 }
 
-func QUO(node yal.Node) ast.Expr {
-	return &ast.BinaryExpr{
+func QUO(node ast.Node) goast.Expr {
+	return &goast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.QUO,
 	}
 }
 
-func REM(node yal.Node) ast.Expr {
-	return &ast.BinaryExpr{
+func REM(node ast.Node) goast.Expr {
+	return &goast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.REM,
 	}
 }
 
-func EQL(node yal.Node) ast.Expr {
-	return &ast.BinaryExpr{
+func EQL(node ast.Node) goast.Expr {
+	return &goast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.EQL,
 	}
 }
 
-func NEQ(node yal.Node) ast.Expr {
-	return &ast.BinaryExpr{
+func NEQ(node ast.Node) goast.Expr {
+	return &goast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.NEQ,
 	}
 }
 
-func GTR(node yal.Node) ast.Expr {
-	return &ast.BinaryExpr{
+func GTR(node ast.Node) goast.Expr {
+	return &goast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.GTR,
 	}
 }
 
-func GEQ(node yal.Node) ast.Expr {
-	return &ast.BinaryExpr{
+func GEQ(node ast.Node) goast.Expr {
+	return &goast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.GEQ,
 	}
 }
 
-func LSS(node yal.Node) ast.Expr {
-	return &ast.BinaryExpr{
+func LSS(node ast.Node) goast.Expr {
+	return &goast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.LSS,
 	}
 }
 
-func LEQ(node yal.Node) ast.Expr {
-	return &ast.BinaryExpr{
+func LEQ(node ast.Node) goast.Expr {
+	return &goast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.LEQ,
 	}
 }
 
-func LOR(node yal.Node) ast.Expr {
-	return &ast.BinaryExpr{
+func LOR(node ast.Node) goast.Expr {
+	return &goast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.LOR,
 	}
 }
 
-func LAND(node yal.Node) ast.Expr {
-	return &ast.BinaryExpr{
+func LAND(node ast.Node) goast.Expr {
+	return &goast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.LAND,

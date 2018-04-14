@@ -1,74 +1,74 @@
 package core
 
 import (
-	"go/ast"
+	goast "go/ast"
 	"go/token"
 
-	"github.com/droptheplot/yal/yal"
+	"github.com/droptheplot/yal/yal/ast"
 )
 
-func IF(node yal.Node) ast.Stmt {
-	return &ast.IfStmt{
+func IF(node ast.Node) goast.Stmt {
+	return &goast.IfStmt{
 		Cond: Expr(node.Nodes[0]),
-		Body: &ast.BlockStmt{
-			List: []ast.Stmt{Stmt(node.Nodes[1])},
+		Body: &goast.BlockStmt{
+			List: []goast.Stmt{Stmt(node.Nodes[1])},
 		},
 	}
 }
 
-func VAR(node yal.Node) ast.Stmt {
-	return &ast.DeclStmt{
-		Decl: &ast.GenDecl{
+func VAR(node ast.Node) goast.Stmt {
+	return &goast.DeclStmt{
+		Decl: &goast.GenDecl{
 			Tok: token.VAR,
-			Specs: []ast.Spec{
-				&ast.ValueSpec{Names: []*ast.Ident{ast.NewIdent(node.Nodes[0].Atom)}, Type: ast.NewIdent(node.Nodes[1].Atom)},
+			Specs: []goast.Spec{
+				&goast.ValueSpec{Names: []*goast.Ident{goast.NewIdent(node.Nodes[0].Atom)}, Type: goast.NewIdent(node.Nodes[1].Atom)},
 			},
 		},
 	}
 }
 
-func RETURN(node yal.Node) ast.Stmt {
-	var exprs []ast.Expr
+func RETURN(node ast.Node) goast.Stmt {
+	var exprs []goast.Expr
 
 	for i, _ := range node.Nodes {
 		exprs = append(exprs, Expr(node.Nodes[i]))
 	}
 
-	return &ast.ReturnStmt{Results: exprs}
+	return &goast.ReturnStmt{Results: exprs}
 }
 
-func ASSIGN(node yal.Node) ast.Stmt {
-	var lhs []ast.Expr
-	var rhs []ast.Expr
+func ASSIGN(node ast.Node) goast.Stmt {
+	var lhs []goast.Expr
+	var rhs []goast.Expr
 
 	for i := 0; i < len(node.Nodes); i = i + 2 {
 		lhs = append(lhs, Expr(node.Nodes[i]))
 		rhs = append(rhs, Expr(node.Nodes[i+1]))
 	}
 
-	return &ast.AssignStmt{Tok: token.ASSIGN, Lhs: lhs, Rhs: rhs}
+	return &goast.AssignStmt{Tok: token.ASSIGN, Lhs: lhs, Rhs: rhs}
 }
 
-func SWITCH(node yal.Node) ast.Stmt {
-	var list []ast.Stmt
+func SWITCH(node ast.Node) goast.Stmt {
+	var list []goast.Stmt
 
 	for i := 1; i < len(node.Nodes); i = i + 2 {
-		var cl []ast.Expr
+		var cl []goast.Expr
 
 		if !isDefault(node.Nodes[i]) {
 			cl = append(cl, Expr(node.Nodes[i]))
 		}
 
-		list = append(list, &ast.CaseClause{
+		list = append(list, &goast.CaseClause{
 			List: cl,
-			Body: []ast.Stmt{
+			Body: []goast.Stmt{
 				Stmt(node.Nodes[i+1]),
 			},
 		})
 	}
 
-	return &ast.SwitchStmt{
+	return &goast.SwitchStmt{
 		Tag:  Expr(node.Nodes[0]),
-		Body: &ast.BlockStmt{List: list},
+		Body: &goast.BlockStmt{List: list},
 	}
 }

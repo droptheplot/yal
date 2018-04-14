@@ -11,7 +11,6 @@ import (
 	"os"
 
 	"github.com/droptheplot/yal/yal"
-	"github.com/droptheplot/yal/yal/core"
 
 	"github.com/kr/pretty"
 )
@@ -32,21 +31,14 @@ func main() {
 
 	src, _ := ioutil.ReadFile(file)
 
-	y := yal.New(src)
+	fset := token.NewFileSet()
+	f := yal.New(src)
 
 	if debug {
-		fmt.Printf("%# v\n\n", pretty.Formatter(y))
+		fmt.Printf("%# v\n\n", pretty.Formatter(f))
 	}
 
-	fset := token.NewFileSet()
-
-	mainFile := &ast.File{
-		Name:  core.Name(y),
-		Decls: core.File(y),
-		Scope: &ast.Scope{},
-	}
-
-	pckg, _ := ast.NewPackage(fset, map[string]*ast.File{"main": mainFile}, nil, nil)
+	pckg, _ := ast.NewPackage(fset, map[string]*ast.File{"main": f}, nil, nil)
 
 	out, _ := GenerateFile(fset, pckg.Files["main"])
 	fmt.Println(string(out))
