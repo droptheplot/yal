@@ -4,7 +4,7 @@ import (
 	goast "go/ast"
 	"go/token"
 
-	"github.com/droptheplot/yal/yal/ast"
+	"github.com/droptheplot/yal/ast"
 )
 
 func IF(node ast.Node) goast.Stmt {

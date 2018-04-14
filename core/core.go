@@ -3,7 +3,7 @@ package core
 import (
 	goast "go/ast"
 
-	"github.com/droptheplot/yal/yal/ast"
+	"github.com/droptheplot/yal/ast"
 )
 
 var Exprs map[string]func(ast.Node) goast.Expr
