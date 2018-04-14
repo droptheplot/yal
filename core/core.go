@@ -63,11 +63,11 @@ func File(node ast.Node) *goast.File {
 	var name *goast.Ident
 	var decls []goast.Decl
 
-	for _, n := range node.Nodes {
-		if isFunc(n) {
-			decls = append(decls, Func(n))
-		} else if isPackage(n) {
-			name = goast.NewIdent(n.Nodes[0].Atom)
+	for i := range node.Nodes {
+		if isFunc(node.Nodes[i]) {
+			decls = append(decls, Func(node.Nodes[i]))
+		} else if isPackage(node.Nodes[i]) {
+			name = goast.NewIdent(node.Nodes[i].Nodes[0].Atom)
 		}
 	}
 
@@ -103,8 +103,8 @@ func FieldList(node ast.Node) *goast.FieldList {
 	var list []*goast.Field
 
 	if node.Atom == "" {
-		for _, n := range node.Nodes {
-			list = append(list, Field(n))
+		for i := range node.Nodes {
+			list = append(list, Field(node.Nodes[i]))
 		}
 	} else {
 		list = append(list, Field(node))
@@ -124,9 +124,9 @@ func Field(node ast.Node) *goast.Field {
 func Stmt(node ast.Node) goast.Stmt {
 	if isStmt(node) {
 		return Stmts[node.Atom](node)
-	} else {
-		return &goast.ExprStmt{X: Expr(node)}
 	}
+
+	return &goast.ExprStmt{X: Expr(node)}
 }
 
 func Expr(node ast.Node) goast.Expr {
@@ -137,8 +137,8 @@ func Expr(node ast.Node) goast.Expr {
 	} else {
 		var args []goast.Expr
 
-		for _, n := range node.Nodes {
-			args = append(args, Expr(n))
+		for i := range node.Nodes {
+			args = append(args, Expr(node.Nodes[i]))
 		}
 
 		e := &goast.CallExpr{

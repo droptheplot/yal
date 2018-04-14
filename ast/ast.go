@@ -39,7 +39,7 @@ func New(src []byte) Node {
 func parse(tokens []string) (Node, int) {
 	var token string
 	var size int = len(tokens)
-	var i int = 0
+	var i int
 
 	node := Node{}
 
@@ -68,8 +68,8 @@ func parse(tokens []string) (Node, int) {
 func tokenize(src string) []string {
 	var tokens []string
 	var char rune
-	var err error = nil
-	var inString bool = false
+	var err error
+	var inString bool
 	var atom []rune
 
 	reader := bufio.NewReader(strings.NewReader(src))
@@ -126,7 +126,7 @@ func isQuote(r rune) bool {
 }
 
 func isLiteral(r rune) bool {
-	for i, _ := range literals {
+	for i := range literals {
 		if literals[i] == r {
 			return true
 		}

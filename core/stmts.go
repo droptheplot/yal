@@ -45,7 +45,7 @@ func VAR(node ast.Node) goast.Stmt {
 func RETURN(node ast.Node) goast.Stmt {
 	var exprs []goast.Expr
 
-	for i, _ := range node.Nodes {
+	for i := range node.Nodes {
 		exprs = append(exprs, Expr(node.Nodes[i]))
 	}
 
