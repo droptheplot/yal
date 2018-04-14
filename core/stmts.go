@@ -7,6 +7,12 @@ import (
 	"github.com/droptheplot/yal/ast"
 )
 
+// IF returns "if" statement.
+//  (if a b)
+// Becomes:
+//  if a {
+//    b
+//  }
 func IF(node ast.Node) goast.Stmt {
 	return &goast.IfStmt{
 		Cond: Expr(node.Nodes[0]),
@@ -16,6 +22,10 @@ func IF(node ast.Node) goast.Stmt {
 	}
 }
 
+// VAR returns "var" statement.
+//  (var a b)
+// Becomes:
+//  var a b
 func VAR(node ast.Node) goast.Stmt {
 	return &goast.DeclStmt{
 		Decl: &goast.GenDecl{
@@ -27,6 +37,11 @@ func VAR(node ast.Node) goast.Stmt {
 	}
 }
 
+// RETURN returns "return" statement.
+// Accepts multiple arguments.
+//  (return a b c)
+// Becomes:
+//  return a, b, c
 func RETURN(node ast.Node) goast.Stmt {
 	var exprs []goast.Expr
 
@@ -37,6 +52,11 @@ func RETURN(node ast.Node) goast.Stmt {
 	return &goast.ReturnStmt{Results: exprs}
 }
 
+// ASSIGN returns "=" statement.
+// Accepts multiple arguments.
+//  (= a b c d)
+// Becomes:
+//  a, c = b, d
 func ASSIGN(node ast.Node) goast.Stmt {
 	var lhs []goast.Expr
 	var rhs []goast.Expr
@@ -49,6 +69,13 @@ func ASSIGN(node ast.Node) goast.Stmt {
 	return &goast.AssignStmt{Tok: token.ASSIGN, Lhs: lhs, Rhs: rhs}
 }
 
+// SWITCH returns "switch" statement.
+// Accepts multiple arguments.
+//  (switch a b c)
+// Becomes:
+//  switch a {
+//    case b: c
+//  }
 func SWITCH(node ast.Node) goast.Stmt {
 	var list []goast.Stmt
 
