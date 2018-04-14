@@ -31,6 +31,7 @@ func init() {
 		"var":    VAR,
 		"return": RETURN,
 		"=":      ASSIGN,
+		"switch": SWITCH,
 	}
 }
 
@@ -52,6 +53,10 @@ func isFunc(node yal.Node) bool {
 
 func isPackage(node yal.Node) bool {
 	return node.Atom == "package"
+}
+
+func isDefault(node yal.Node) bool {
+	return node.Atom == "default"
 }
 
 func File(node yal.Node) []ast.Decl {

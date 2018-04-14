@@ -48,3 +48,27 @@ func ASSIGN(node yal.Node) ast.Stmt {
 
 	return &ast.AssignStmt{Tok: token.ASSIGN, Lhs: lhs, Rhs: rhs}
 }
+
+func SWITCH(node yal.Node) ast.Stmt {
+	var list []ast.Stmt
+
+	for i := 1; i < len(node.Nodes); i = i + 2 {
+		var cl []ast.Expr
+
+		if !isDefault(node.Nodes[i]) {
+			cl = append(cl, Expr(node.Nodes[i]))
+		}
+
+		list = append(list, &ast.CaseClause{
+			List: cl,
+			Body: []ast.Stmt{
+				Stmt(node.Nodes[i+1]),
+			},
+		})
+	}
+
+	return &ast.SwitchStmt{
+		Tag:  Expr(node.Nodes[0]),
+		Body: &ast.BlockStmt{List: list},
+	}
+}
