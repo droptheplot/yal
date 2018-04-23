@@ -1,10 +1,8 @@
-package core
+package yal
 
 import (
-	goast "go/ast"
+	"go/ast"
 	"go/token"
-
-	"github.com/droptheplot/yal/ast"
 )
 
 // IF returns "if" statement.
@@ -13,11 +11,11 @@ import (
 //  if a {
 //    b
 //  }
-func IF(node ast.Node) goast.Stmt {
-	return &goast.IfStmt{
+func IF(node Node) ast.Stmt {
+	return &ast.IfStmt{
 		Cond: Expr(node.Nodes[0]),
-		Body: &goast.BlockStmt{
-			List: []goast.Stmt{Stmt(node.Nodes[1])},
+		Body: &ast.BlockStmt{
+			List: []ast.Stmt{Stmt(node.Nodes[1])},
 		},
 	}
 }
@@ -26,12 +24,12 @@ func IF(node ast.Node) goast.Stmt {
 //  (var a b)
 // Becomes:
 //  var a b
-func VAR(node ast.Node) goast.Stmt {
-	return &goast.DeclStmt{
-		Decl: &goast.GenDecl{
+func VAR(node Node) ast.Stmt {
+	return &ast.DeclStmt{
+		Decl: &ast.GenDecl{
 			Tok: token.VAR,
-			Specs: []goast.Spec{
-				&goast.ValueSpec{Names: []*goast.Ident{goast.NewIdent(node.Nodes[0].Atom)}, Type: goast.NewIdent(node.Nodes[1].Atom)},
+			Specs: []ast.Spec{
+				&ast.ValueSpec{Names: []*ast.Ident{ast.NewIdent(node.Nodes[0].Atom)}, Type: ast.NewIdent(node.Nodes[1].Atom)},
 			},
 		},
 	}
@@ -42,14 +40,14 @@ func VAR(node ast.Node) goast.Stmt {
 //  (return a b c)
 // Becomes:
 //  return a, b, c
-func RETURN(node ast.Node) goast.Stmt {
-	var exprs []goast.Expr
+func RETURN(node Node) ast.Stmt {
+	var exprs []ast.Expr
 
 	for i := range node.Nodes {
 		exprs = append(exprs, Expr(node.Nodes[i]))
 	}
 
-	return &goast.ReturnStmt{Results: exprs}
+	return &ast.ReturnStmt{Results: exprs}
 }
 
 // ASSIGN returns "=" statement.
@@ -57,16 +55,16 @@ func RETURN(node ast.Node) goast.Stmt {
 //  (= a b c d)
 // Becomes:
 //  a, c = b, d
-func ASSIGN(node ast.Node) goast.Stmt {
-	var lhs []goast.Expr
-	var rhs []goast.Expr
+func ASSIGN(node Node) ast.Stmt {
+	var lhs []ast.Expr
+	var rhs []ast.Expr
 
 	for i := 0; i < len(node.Nodes); i = i + 2 {
 		lhs = append(lhs, Expr(node.Nodes[i]))
 		rhs = append(rhs, Expr(node.Nodes[i+1]))
 	}
 
-	return &goast.AssignStmt{Tok: token.ASSIGN, Lhs: lhs, Rhs: rhs}
+	return &ast.AssignStmt{Tok: token.ASSIGN, Lhs: lhs, Rhs: rhs}
 }
 
 // SWITCH returns "switch" statement.
@@ -76,26 +74,26 @@ func ASSIGN(node ast.Node) goast.Stmt {
 //  switch a {
 //    case b: c
 //  }
-func SWITCH(node ast.Node) goast.Stmt {
-	var list []goast.Stmt
+func SWITCH(node Node) ast.Stmt {
+	var list []ast.Stmt
 
 	for i := 1; i < len(node.Nodes); i = i + 2 {
-		var cl []goast.Expr
+		var cl []ast.Expr
 
 		if !isDefault(node.Nodes[i]) {
 			cl = append(cl, Expr(node.Nodes[i]))
 		}
 
-		list = append(list, &goast.CaseClause{
+		list = append(list, &ast.CaseClause{
 			List: cl,
-			Body: []goast.Stmt{
+			Body: []ast.Stmt{
 				Stmt(node.Nodes[i+1]),
 			},
 		})
 	}
 
-	return &goast.SwitchStmt{
+	return &ast.SwitchStmt{
 		Tag:  Expr(node.Nodes[0]),
-		Body: &goast.BlockStmt{List: list},
+		Body: &ast.BlockStmt{List: list},
 	}
 }

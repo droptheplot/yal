@@ -1,78 +1,40 @@
-package ast
+package tokenizer
 
 import (
 	"bufio"
-	"strings"
+	"bytes"
 )
 
 var literals []rune
 
 func init() {
 	literals = []rune{'%', '+', '-', '/', '*', '=', '>', '<', '.', '|', '!', '&', '[', ']'}
-	var i rune
 
-	for i = 'a'; i <= 'z'; i++ {
+	for i := 'a'; i <= 'z'; i++ {
 		literals = append(literals, i)
 	}
 
-	for i = 'A'; i <= 'Z'; i++ {
+	for i := 'A'; i <= 'Z'; i++ {
 		literals = append(literals, i)
 	}
 
-	for i = '0'; i <= '9'; i++ {
+	for i := '0'; i <= '9'; i++ {
 		literals = append(literals, i)
 	}
 }
 
-type Node struct {
-	Atom  string
-	Nodes []Node
-}
-
-func New(src []byte) Node {
-	tokens := tokenize(string(src))
-	node, _ := parse(tokens)
-
-	return node
-}
-
-func parse(tokens []string) (Node, int) {
-	var token string
-	var size int = len(tokens)
-	var i int
-
-	node := Node{}
-
-	for i < size {
-		token = tokens[i]
-
-		if token == "(" {
-			tmp, move := parse(tokens[i+1:])
-			node.Nodes = append(node.Nodes, tmp)
-			i += move + 1
-		} else if token == ")" {
-			return node, i
-		} else if node.Atom == "" {
-			node.Atom = token
-		} else {
-			var valueNode = Node{Atom: token}
-			node.Nodes = append(node.Nodes, valueNode)
-		}
-
-		i++
-	}
-
-	return node, size
-}
-
-func tokenize(src string) []string {
+// Tokenize returns slice of tokens. For example, expression like:
+//   (+ "hello" "world")
+// Will be converted to:
+//   "(", "+", "hello", "world", ")"
+func Tokenize(src []byte) []string {
 	var tokens []string
 	var char rune
 	var err error
 	var inString bool
 	var atom []rune
 
-	reader := bufio.NewReader(strings.NewReader(src))
+	reader := bufio.NewReader(bytes.NewReader(src))
 
 	for err == nil {
 		char, _, err = reader.ReadRune()

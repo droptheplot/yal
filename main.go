@@ -10,6 +10,8 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/droptheplot/yal/parser"
+	"github.com/droptheplot/yal/tokenizer"
 	"github.com/droptheplot/yal/yal"
 
 	"github.com/kr/pretty"
@@ -31,25 +33,31 @@ func main() {
 
 	src, _ := ioutil.ReadFile(file)
 
-	fset := token.NewFileSet()
-	f := yal.New(src)
+	f := GenerateFile(src)
 
 	if debug {
 		fmt.Printf("%# v\n\n", pretty.Formatter(f))
 	}
 
-	pckg, _ := ast.NewPackage(fset, map[string]*ast.File{"main": f}, nil, nil)
+	pckg, _ := ast.NewPackage(token.NewFileSet(), map[string]*ast.File{"main": f}, nil, nil)
 
-	out, _ := GenerateFile(fset, pckg.Files["main"])
+	out, _ := PrintFile(pckg.Files["main"])
 	fmt.Println(string(out))
 }
 
-func GenerateFile(fset *token.FileSet, file *ast.File) ([]byte, error) {
+func GenerateFile(src []byte) *ast.File {
+	tokens := tokenizer.Tokenize(src)
+	node, _ := parser.Parse(tokens)
+
+	return yal.File(node)
+}
+
+func PrintFile(file *ast.File) ([]byte, error) {
 	var output []byte
 
 	buffer := bytes.NewBuffer(output)
 
-	if err := printer.Fprint(buffer, fset, file); err != nil {
+	if err := printer.Fprint(buffer, token.NewFileSet(), file); err != nil {
 		return nil, err
 	}
 

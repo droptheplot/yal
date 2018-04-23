@@ -1,16 +1,14 @@
-package core
+package yal
 
 import (
-	goast "go/ast"
+	"go/ast"
 	"go/token"
-
-	"github.com/droptheplot/yal/ast"
 )
 
 // ADD returns expression for addition.
 //  (+ a b)
-func ADD(node ast.Node) goast.Expr {
-	e := &goast.BinaryExpr{
+func ADD(node Node) ast.Expr {
+	e := &ast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.ADD,
@@ -21,8 +19,8 @@ func ADD(node ast.Node) goast.Expr {
 
 // SUB returns expression for subtraction.
 //  (- a b)
-func SUB(node ast.Node) goast.Expr {
-	return &goast.BinaryExpr{
+func SUB(node Node) ast.Expr {
+	return &ast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.SUB,
@@ -31,8 +29,8 @@ func SUB(node ast.Node) goast.Expr {
 
 // MUL returns expression for multiplication.
 //  (* a b)
-func MUL(node ast.Node) goast.Expr {
-	return &goast.BinaryExpr{
+func MUL(node Node) ast.Expr {
+	return &ast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.MUL,
@@ -41,8 +39,8 @@ func MUL(node ast.Node) goast.Expr {
 
 // QUO returns expression for division.
 //  (/ a b)
-func QUO(node ast.Node) goast.Expr {
-	return &goast.BinaryExpr{
+func QUO(node Node) ast.Expr {
+	return &ast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.QUO,
@@ -51,8 +49,8 @@ func QUO(node ast.Node) goast.Expr {
 
 // REM returns expression for remainder.
 //  (% a b)
-func REM(node ast.Node) goast.Expr {
-	return &goast.BinaryExpr{
+func REM(node Node) ast.Expr {
+	return &ast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.REM,
@@ -61,8 +59,8 @@ func REM(node ast.Node) goast.Expr {
 
 // EQL returns expression for equality.
 //  (== a b)
-func EQL(node ast.Node) goast.Expr {
-	return &goast.BinaryExpr{
+func EQL(node Node) ast.Expr {
+	return &ast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.EQL,
@@ -71,8 +69,8 @@ func EQL(node ast.Node) goast.Expr {
 
 // NEQ returns expression for inequality.
 //  (!= a b)
-func NEQ(node ast.Node) goast.Expr {
-	return &goast.BinaryExpr{
+func NEQ(node Node) ast.Expr {
+	return &ast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.NEQ,
@@ -81,8 +79,8 @@ func NEQ(node ast.Node) goast.Expr {
 
 // GTR returns "greater than" expression.
 //  (> a b)
-func GTR(node ast.Node) goast.Expr {
-	return &goast.BinaryExpr{
+func GTR(node Node) ast.Expr {
+	return &ast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.GTR,
@@ -91,8 +89,8 @@ func GTR(node ast.Node) goast.Expr {
 
 // GEQ returns "greater than or equal" expression.
 //  (>= a b)
-func GEQ(node ast.Node) goast.Expr {
-	return &goast.BinaryExpr{
+func GEQ(node Node) ast.Expr {
+	return &ast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.GEQ,
@@ -101,8 +99,8 @@ func GEQ(node ast.Node) goast.Expr {
 
 // LSS returns "less than" expression.
 //  (< a b)
-func LSS(node ast.Node) goast.Expr {
-	return &goast.BinaryExpr{
+func LSS(node Node) ast.Expr {
+	return &ast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.LSS,
@@ -111,8 +109,8 @@ func LSS(node ast.Node) goast.Expr {
 
 // LEQ returns "less than or equal" expression.
 //  (<= a b)
-func LEQ(node ast.Node) goast.Expr {
-	return &goast.BinaryExpr{
+func LEQ(node Node) ast.Expr {
+	return &ast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.LEQ,
@@ -121,8 +119,8 @@ func LEQ(node ast.Node) goast.Expr {
 
 // LOR returns "or" expression.
 //  (<= a b)
-func LOR(node ast.Node) goast.Expr {
-	return &goast.BinaryExpr{
+func LOR(node Node) ast.Expr {
+	return &ast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.LOR,
@@ -131,8 +129,8 @@ func LOR(node ast.Node) goast.Expr {
 
 // LAND returns "and" expression.
 //  (&& a b)
-func LAND(node ast.Node) goast.Expr {
-	return &goast.BinaryExpr{
+func LAND(node Node) ast.Expr {
+	return &ast.BinaryExpr{
 		X:  Expr(node.Nodes[0]),
 		Y:  Expr(node.Nodes[1]),
 		Op: token.LAND,
