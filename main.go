@@ -45,19 +45,13 @@ func main() {
 
 	pckg, _ := ast.NewPackage(token.NewFileSet(), map[string]*ast.File{"main": file}, nil, nil)
 
-	out, _ := PrintFile(pckg.Files["main"])
-
-	fmt.Println(string(out))
+	PrintFile(pckg.Files["main"])
 }
 
-func PrintFile(file *ast.File) ([]byte, error) {
-	var output []byte
+func PrintFile(file *ast.File) {
+	buffer := &bytes.Buffer{}
 
-	buffer := bytes.NewBuffer(output)
+	printer.Fprint(buffer, token.NewFileSet(), file)
 
-	if err := printer.Fprint(buffer, token.NewFileSet(), file); err != nil {
-		return nil, err
-	}
-
-	return buffer.Bytes(), nil
+	fmt.Println(buffer)
 }
