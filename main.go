@@ -13,43 +13,41 @@ import (
 	"github.com/droptheplot/yal/parser"
 	"github.com/droptheplot/yal/tokenizer"
 	"github.com/droptheplot/yal/yal"
-
 	"github.com/kr/pretty"
 )
 
 func main() {
-	var debug bool
-	var file string
+	var debugTokens, debugNodes bool
+	var path string
 
-	flag.StringVar(&file, "file", "", "Path to file")
-	flag.BoolVar(&debug, "debug", false, "Debug mode")
-
+	flag.StringVar(&path, "path", "", "Path to file.")
+	flag.BoolVar(&debugTokens, "tokens", false, "Print tokens.")
+	flag.BoolVar(&debugNodes, "nodes", false, "Print nodes.")
 	flag.Parse()
 
-	if file == "" {
+	if path == "" {
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
 
-	src, _ := ioutil.ReadFile(file)
-
-	f := GenerateFile(src)
-
-	if debug {
-		fmt.Printf("%# v\n\n", pretty.Formatter(f))
-	}
-
-	pckg, _ := ast.NewPackage(token.NewFileSet(), map[string]*ast.File{"main": f}, nil, nil)
-
-	out, _ := PrintFile(pckg.Files["main"])
-	fmt.Println(string(out))
-}
-
-func GenerateFile(src []byte) *ast.File {
+	src, _ := ioutil.ReadFile(path)
 	tokens := tokenizer.Tokenize(src)
 	node, _ := parser.Parse(tokens)
+	file := yal.File(node)
 
-	return yal.File(node)
+	if debugTokens {
+		fmt.Printf("%#v\n\n", tokens)
+	}
+
+	if debugNodes {
+		fmt.Printf("%# v\n\n", pretty.Formatter(node))
+	}
+
+	pckg, _ := ast.NewPackage(token.NewFileSet(), map[string]*ast.File{"main": file}, nil, nil)
+
+	out, _ := PrintFile(pckg.Files["main"])
+
+	fmt.Println(string(out))
 }
 
 func PrintFile(file *ast.File) ([]byte, error) {
