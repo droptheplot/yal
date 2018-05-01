@@ -43,6 +43,8 @@ func main() {
 		fmt.Printf("%# v\n\n", pretty.Formatter(node))
 	}
 
+	ast.SortImports(token.NewFileSet(), file)
+
 	pckg, _ := ast.NewPackage(token.NewFileSet(), map[string]*ast.File{"main": file}, nil, nil)
 
 	PrintFile(pckg.Files["main"])

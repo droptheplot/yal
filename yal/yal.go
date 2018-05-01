@@ -2,6 +2,7 @@ package yal
 
 import (
 	"go/ast"
+	"go/token"
 )
 
 var Exprs map[string]func(Node) ast.Expr
@@ -57,15 +58,26 @@ func isDefault(node Node) bool {
 	return node.Atom == "default"
 }
 
+func isImport(node Node) bool {
+	return node.Atom == "import"
+}
+
 func File(node Node) *ast.File {
 	var name *ast.Ident
 	var decls []ast.Decl
+	var specs []ast.Spec
+
+	imports := &ast.GenDecl{Tok: token.IMPORT, Specs: specs}
+
+	decls = append(decls, imports)
 
 	for i := range node.Nodes {
 		if isFunc(node.Nodes[i]) {
 			decls = append(decls, Func(node.Nodes[i]))
 		} else if isPackage(node.Nodes[i]) {
 			name = ast.NewIdent(node.Nodes[i].Nodes[0].Atom)
+		} else if isImport(node.Nodes[i]) {
+			imports.Specs = append(imports.Specs, Import(node.Nodes[i]))
 		}
 	}
 
@@ -117,6 +129,15 @@ func Field(node Node) *ast.Field {
 	}
 
 	return &ast.Field{Names: []*ast.Ident{ast.NewIdent(node.Atom)}, Type: ast.NewIdent(node.Nodes[0].Atom)}
+}
+
+func Import(node Node) *ast.ImportSpec {
+	return &ast.ImportSpec{
+		Path: &ast.BasicLit{
+			Kind:  token.STRING,
+			Value: node.Nodes[0].Atom,
+		},
+	}
 }
 
 func Stmt(node Node) ast.Stmt {

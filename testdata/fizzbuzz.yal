@@ -1,5 +1,7 @@
 (package testdata)
 
+(import "strconv")
+
 (func FizzBuzz ((n int) (end int) (res *[]string)) ()
   (if (== n (+ end 1))
     (return))
