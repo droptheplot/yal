@@ -13,16 +13,12 @@ import (
 	"github.com/droptheplot/yal/parser"
 	"github.com/droptheplot/yal/tokenizer"
 	"github.com/droptheplot/yal/yal"
-	"github.com/kr/pretty"
 )
 
 func main() {
-	var debugTokens, debugNodes bool
 	var path string
 
 	flag.StringVar(&path, "path", "", "Path to file.")
-	flag.BoolVar(&debugTokens, "tokens", false, "Print tokens.")
-	flag.BoolVar(&debugNodes, "nodes", false, "Print nodes.")
 	flag.Parse()
 
 	if path == "" {
@@ -31,23 +27,10 @@ func main() {
 	}
 
 	src, _ := ioutil.ReadFile(path)
-	tokens := tokenizer.Tokenize(src)
-	node, _ := parser.Parse(tokens)
-	file := yal.File(node)
 
-	if debugTokens {
-		fmt.Printf("%#v\n\n", tokens)
-	}
+	file := yal.New(&tokenizer.Tokenizer{}, &parser.Parser{}).Run(src)
 
-	if debugNodes {
-		fmt.Printf("%# v\n\n", pretty.Formatter(node))
-	}
-
-	ast.SortImports(token.NewFileSet(), file)
-
-	pckg, _ := ast.NewPackage(token.NewFileSet(), map[string]*ast.File{"main": file}, nil, nil)
-
-	PrintFile(pckg.Files["main"])
+	PrintFile(file)
 }
 
 func PrintFile(file *ast.File) {

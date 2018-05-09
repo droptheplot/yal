@@ -5,6 +5,19 @@ import (
 	"go/token"
 )
 
+type Tokenizer interface {
+	Tokenize(src []byte) []string
+}
+
+type Parser interface {
+	Parse(tokens []string) (Node, int)
+}
+
+type Yal struct {
+	tokenizer Tokenizer
+	parser    Parser
+}
+
 var Exprs map[string]func(Node) ast.Expr
 var Stmts map[string]func(Node) ast.Stmt
 
@@ -32,6 +45,21 @@ func init() {
 		"=":      ASSIGN,
 		"switch": SWITCH,
 	}
+}
+
+func New(t Tokenizer, p Parser) *Yal {
+	return &Yal{
+		tokenizer: t,
+		parser:    p,
+	}
+}
+
+func (y *Yal) Run(src []byte) *ast.File {
+	tokens := y.tokenizer.Tokenize(src)
+	node, _ := y.parser.Parse(tokens)
+	file := File(node)
+
+	return file
 }
 
 func isExpr(node Node) bool {
@@ -81,11 +109,15 @@ func File(node Node) *ast.File {
 		}
 	}
 
-	return &ast.File{
+	file := &ast.File{
 		Name:  name,
 		Decls: decls,
 		Scope: &ast.Scope{},
 	}
+
+	ast.SortImports(token.NewFileSet(), file)
+
+	return file
 }
 
 func Func(node Node) ast.Decl {

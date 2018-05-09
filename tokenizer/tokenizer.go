@@ -5,6 +5,8 @@ import (
 	"bytes"
 )
 
+type Tokenizer struct{}
+
 var literals []rune
 
 func init() {
@@ -27,7 +29,7 @@ func init() {
 //   (+ "hello" "world")
 // Will be converted to:
 //   "(", "+", "hello", "world", ")"
-func Tokenize(src []byte) []string {
+func (_ Tokenizer) Tokenize(src []byte) []string {
 	var tokens []string
 	var char rune
 	var err error
