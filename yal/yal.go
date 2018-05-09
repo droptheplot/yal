@@ -10,7 +10,7 @@ type Tokenizer interface {
 }
 
 type Parser interface {
-	Parse(tokens []string) (Node, int)
+	Parse(tokens []string) Node
 }
 
 type Yal struct {
@@ -56,7 +56,7 @@ func New(t Tokenizer, p Parser) *Yal {
 
 func (y *Yal) Run(src []byte) *ast.File {
 	tokens := y.tokenizer.Tokenize(src)
-	node, _ := y.parser.Parse(tokens)
+	node := y.parser.Parse(tokens)
 	file := File(node)
 
 	return file
