@@ -9,8 +9,8 @@ import (
 //  (+ a b)
 func ADD(node Node) ast.Expr {
 	e := &ast.BinaryExpr{
-		X:  Expr(node.Nodes[0]),
-		Y:  Expr(node.Nodes[1]),
+		X:  node.Nodes[0].Expr(),
+		Y:  node.Nodes[1].Expr(),
 		Op: token.ADD,
 	}
 
@@ -21,8 +21,8 @@ func ADD(node Node) ast.Expr {
 //  (- a b)
 func SUB(node Node) ast.Expr {
 	return &ast.BinaryExpr{
-		X:  Expr(node.Nodes[0]),
-		Y:  Expr(node.Nodes[1]),
+		X:  node.Nodes[0].Expr(),
+		Y:  node.Nodes[1].Expr(),
 		Op: token.SUB,
 	}
 }
@@ -31,8 +31,8 @@ func SUB(node Node) ast.Expr {
 //  (* a b)
 func MUL(node Node) ast.Expr {
 	return &ast.BinaryExpr{
-		X:  Expr(node.Nodes[0]),
-		Y:  Expr(node.Nodes[1]),
+		X:  node.Nodes[0].Expr(),
+		Y:  node.Nodes[1].Expr(),
 		Op: token.MUL,
 	}
 }
@@ -41,8 +41,8 @@ func MUL(node Node) ast.Expr {
 //  (/ a b)
 func QUO(node Node) ast.Expr {
 	return &ast.BinaryExpr{
-		X:  Expr(node.Nodes[0]),
-		Y:  Expr(node.Nodes[1]),
+		X:  node.Nodes[0].Expr(),
+		Y:  node.Nodes[1].Expr(),
 		Op: token.QUO,
 	}
 }
@@ -51,8 +51,8 @@ func QUO(node Node) ast.Expr {
 //  (% a b)
 func REM(node Node) ast.Expr {
 	return &ast.BinaryExpr{
-		X:  Expr(node.Nodes[0]),
-		Y:  Expr(node.Nodes[1]),
+		X:  node.Nodes[0].Expr(),
+		Y:  node.Nodes[1].Expr(),
 		Op: token.REM,
 	}
 }
@@ -61,8 +61,8 @@ func REM(node Node) ast.Expr {
 //  (== a b)
 func EQL(node Node) ast.Expr {
 	return &ast.BinaryExpr{
-		X:  Expr(node.Nodes[0]),
-		Y:  Expr(node.Nodes[1]),
+		X:  node.Nodes[0].Expr(),
+		Y:  node.Nodes[1].Expr(),
 		Op: token.EQL,
 	}
 }
@@ -71,8 +71,8 @@ func EQL(node Node) ast.Expr {
 //  (!= a b)
 func NEQ(node Node) ast.Expr {
 	return &ast.BinaryExpr{
-		X:  Expr(node.Nodes[0]),
-		Y:  Expr(node.Nodes[1]),
+		X:  node.Nodes[0].Expr(),
+		Y:  node.Nodes[1].Expr(),
 		Op: token.NEQ,
 	}
 }
@@ -81,8 +81,8 @@ func NEQ(node Node) ast.Expr {
 //  (> a b)
 func GTR(node Node) ast.Expr {
 	return &ast.BinaryExpr{
-		X:  Expr(node.Nodes[0]),
-		Y:  Expr(node.Nodes[1]),
+		X:  node.Nodes[0].Expr(),
+		Y:  node.Nodes[1].Expr(),
 		Op: token.GTR,
 	}
 }
@@ -91,8 +91,8 @@ func GTR(node Node) ast.Expr {
 //  (>= a b)
 func GEQ(node Node) ast.Expr {
 	return &ast.BinaryExpr{
-		X:  Expr(node.Nodes[0]),
-		Y:  Expr(node.Nodes[1]),
+		X:  node.Nodes[0].Expr(),
+		Y:  node.Nodes[1].Expr(),
 		Op: token.GEQ,
 	}
 }
@@ -101,8 +101,8 @@ func GEQ(node Node) ast.Expr {
 //  (< a b)
 func LSS(node Node) ast.Expr {
 	return &ast.BinaryExpr{
-		X:  Expr(node.Nodes[0]),
-		Y:  Expr(node.Nodes[1]),
+		X:  node.Nodes[0].Expr(),
+		Y:  node.Nodes[1].Expr(),
 		Op: token.LSS,
 	}
 }
@@ -111,8 +111,8 @@ func LSS(node Node) ast.Expr {
 //  (<= a b)
 func LEQ(node Node) ast.Expr {
 	return &ast.BinaryExpr{
-		X:  Expr(node.Nodes[0]),
-		Y:  Expr(node.Nodes[1]),
+		X:  node.Nodes[0].Expr(),
+		Y:  node.Nodes[1].Expr(),
 		Op: token.LEQ,
 	}
 }
@@ -121,8 +121,8 @@ func LEQ(node Node) ast.Expr {
 //  (<= a b)
 func LOR(node Node) ast.Expr {
 	return &ast.BinaryExpr{
-		X:  Expr(node.Nodes[0]),
-		Y:  Expr(node.Nodes[1]),
+		X:  node.Nodes[0].Expr(),
+		Y:  node.Nodes[1].Expr(),
 		Op: token.LOR,
 	}
 }
@@ -131,8 +131,8 @@ func LOR(node Node) ast.Expr {
 //  (&& a b)
 func LAND(node Node) ast.Expr {
 	return &ast.BinaryExpr{
-		X:  Expr(node.Nodes[0]),
-		Y:  Expr(node.Nodes[1]),
+		X:  node.Nodes[0].Expr(),
+		Y:  node.Nodes[1].Expr(),
 		Op: token.LAND,
 	}
 }

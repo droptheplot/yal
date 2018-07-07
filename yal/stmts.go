@@ -13,9 +13,9 @@ import (
 //  }
 func IF(node Node) ast.Stmt {
 	return &ast.IfStmt{
-		Cond: Expr(node.Nodes[0]),
+		Cond: node.Nodes[0].Expr(),
 		Body: &ast.BlockStmt{
-			List: []ast.Stmt{Stmt(node.Nodes[1])},
+			List: []ast.Stmt{node.Nodes[1].Stmt()},
 		},
 	}
 }
@@ -44,7 +44,7 @@ func RETURN(node Node) ast.Stmt {
 	var exprs []ast.Expr
 
 	for i := range node.Nodes {
-		exprs = append(exprs, Expr(node.Nodes[i]))
+		exprs = append(exprs, node.Nodes[i].Expr())
 	}
 
 	return &ast.ReturnStmt{Results: exprs}
@@ -60,8 +60,8 @@ func ASSIGN(node Node) ast.Stmt {
 	var rhs []ast.Expr
 
 	for i := 0; i < len(node.Nodes); i = i + 2 {
-		lhs = append(lhs, Expr(node.Nodes[i]))
-		rhs = append(rhs, Expr(node.Nodes[i+1]))
+		lhs = append(lhs, node.Nodes[i].Expr())
+		rhs = append(rhs, node.Nodes[i+1].Expr())
 	}
 
 	return &ast.AssignStmt{Tok: token.ASSIGN, Lhs: lhs, Rhs: rhs}
@@ -80,20 +80,20 @@ func SWITCH(node Node) ast.Stmt {
 	for i := 1; i < len(node.Nodes); i = i + 2 {
 		var cl []ast.Expr
 
-		if !isDefault(node.Nodes[i]) {
-			cl = append(cl, Expr(node.Nodes[i]))
+		if !node.Nodes[i].isDefault() {
+			cl = append(cl, node.Nodes[i].Expr())
 		}
 
 		list = append(list, &ast.CaseClause{
 			List: cl,
 			Body: []ast.Stmt{
-				Stmt(node.Nodes[i+1]),
+				node.Nodes[i+1].Stmt(),
 			},
 		})
 	}
 
 	return &ast.SwitchStmt{
-		Tag:  Expr(node.Nodes[0]),
+		Tag:  node.Nodes[0].Expr(),
 		Body: &ast.BlockStmt{List: list},
 	}
 }
