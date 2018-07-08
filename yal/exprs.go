@@ -136,3 +136,41 @@ func LAND(node Node) ast.Expr {
 		Op: token.LAND,
 	}
 }
+
+// SLICE returns composite literal expression for slice.
+// First node represents element type.
+//  (slice type a b)
+func SLICE(node Node) ast.Expr {
+	var elts []ast.Expr
+
+	for _, n := range node.Nodes[1:] {
+		elts = append(elts, n.Expr())
+	}
+
+	return &ast.CompositeLit{
+		Type: &ast.ArrayType{
+			Elt: ast.NewIdent(node.Nodes[0].Atom),
+		},
+		Elts: elts,
+	}
+}
+
+// ARRAY returns composite literal expression for array.
+// First node represents element type.
+// Second node represents array size.
+//  (array type n a b)
+func ARRAY(node Node) ast.Expr {
+	var elts []ast.Expr
+
+	for _, n := range node.Nodes[1:] {
+		elts = append(elts, n.Expr())
+	}
+
+	return &ast.CompositeLit{
+		Type: &ast.ArrayType{
+			Len: node.Nodes[1].Expr(),
+			Elt: ast.NewIdent(node.Nodes[0].Atom),
+		},
+		Elts: elts,
+	}
+}

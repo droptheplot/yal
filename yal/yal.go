@@ -22,19 +22,21 @@ var Stmts map[string]func(Node) ast.Stmt
 
 func init() {
 	Exprs = map[string]func(Node) ast.Expr{
-		"+":  ADD,
-		"-":  SUB,
-		"*":  MUL,
-		"/":  QUO,
-		"%":  REM,
-		"==": EQL,
-		"!=": NEQ,
-		">":  GTR,
-		">=": GEQ,
-		"<":  LSS,
-		"<=": LEQ,
-		"||": LOR,
-		"&&": LAND,
+		"+":     ADD,
+		"-":     SUB,
+		"*":     MUL,
+		"/":     QUO,
+		"%":     REM,
+		"==":    EQL,
+		"!=":    NEQ,
+		">":     GTR,
+		">=":    GEQ,
+		"<":     LSS,
+		"<=":    LEQ,
+		"||":    LOR,
+		"&&":    LAND,
+		"slice": SLICE,
+		"array": ARRAY,
 	}
 
 	Stmts = map[string]func(Node) ast.Stmt{
