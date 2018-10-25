@@ -182,7 +182,7 @@ func ARRAY(node Node) ast.Expr {
 func MAP(node Node) ast.Expr {
 	var elementIdent = ast.NewIdent("[]" + node.Nodes[0].Atom)
 	var funcIdent = node.Nodes[1].Ident()
-	var valuesIdent = node.Nodes[2].Ident()
+	var valuesExpr = node.Nodes[2].Expr()
 
 	return &ast.CallExpr{
 		Fun: &ast.FuncLit{
@@ -237,6 +237,6 @@ func MAP(node Node) ast.Expr {
 				},
 			},
 		},
-		Args: []ast.Expr{valuesIdent},
+		Args: []ast.Expr{valuesExpr},
 	}
 }
