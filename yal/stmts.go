@@ -67,6 +67,23 @@ func ASSIGN(node Node) ast.Stmt {
 	return &ast.AssignStmt{Tok: token.ASSIGN, Lhs: lhs, Rhs: rhs}
 }
 
+// DEFINE returns ":=" statement.
+// Accepts multiple arguments.
+//  (:= a b c d)
+// Becomes:
+//  a, c := b, d
+func DEFINE(node Node) ast.Stmt {
+	var lhs []ast.Expr
+	var rhs []ast.Expr
+
+	for i := 0; i < len(node.Nodes); i = i + 2 {
+		lhs = append(lhs, node.Nodes[i].Expr())
+		rhs = append(rhs, node.Nodes[i+1].Expr())
+	}
+
+	return &ast.AssignStmt{Tok: token.DEFINE, Lhs: lhs, Rhs: rhs}
+}
+
 // SWITCH returns "switch" statement.
 // Accepts multiple arguments.
 //  (switch a b c)

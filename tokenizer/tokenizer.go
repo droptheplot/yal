@@ -10,7 +10,7 @@ type Tokenizer struct{}
 var literals []rune
 
 func init() {
-	literals = []rune{'%', '+', '-', '/', '*', '=', '>', '<', '.', '|', '!', '&', '[', ']'}
+	literals = []rune{'%', '+', '-', '/', '*', '=', '>', '<', '.', '|', '!', '&', '[', ']', ':'}
 
 	for i := 'a'; i <= 'z'; i++ {
 		literals = append(literals, i)

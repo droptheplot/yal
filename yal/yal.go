@@ -44,6 +44,7 @@ func init() {
 		"var":    VAR,
 		"return": RETURN,
 		"=":      ASSIGN,
+		":=":     DEFINE,
 		"switch": SWITCH,
 	}
 }
