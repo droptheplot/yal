@@ -38,23 +38,23 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Println(mul(2, 3))
+  fmt.Println(mul(2, 3))
 }
 
 func mul(a int, b int) int {
-	return(a * b)
+  return(a * b)
 }
 ```
 
 ## Disclaimer
 
-- Since `yal` is not a stand-alone language and just Lisp syntax fo Go we can't get rid (at least for now) from all statements: that means it's not possible to make `if`, `switch` return anything like you would in real functional languages.
-- This is fun project and is not meant to be used anywhere.
+This is a fun project and is not meant to be used anywhere.
 
 ## Features
 
 - Declarations (`func`, `var`, `package`, `import`)
 - Arithmetics (`+`, `-`, `*`, `/`, `%`)
 - Comparisons (`<`, `>`, `<=`, `>=`, `==`, `!=`)
-- Control flow (`if`, `switch`, `return`)
 - Boolean operators (`&&`, `||`)
+- Slice operations (`map`)
+- Control flow statements (`if`, `switch`, `return`)
