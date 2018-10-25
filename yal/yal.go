@@ -37,6 +37,7 @@ func init() {
 		"&&":    LAND,
 		"slice": SLICE,
 		"array": ARRAY,
+		"map":   MAP,
 	}
 
 	Stmts = map[string]func(Node) ast.Stmt{

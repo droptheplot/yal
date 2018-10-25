@@ -148,3 +148,7 @@ func (node Node) Expr() ast.Expr {
 		return e
 	}
 }
+
+func (node Node) Ident() *ast.Ident {
+	return ast.NewIdent(node.Atom)
+}

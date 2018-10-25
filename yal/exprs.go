@@ -174,3 +174,69 @@ func ARRAY(node Node) ast.Expr {
 		Elts: elts,
 	}
 }
+
+// MAP generates anonymous function which applies function `f` to each element
+// in slice `a` of type `type` and returns new slice.
+// Function `f` should have one argument and one return value with same type as `type`.
+//  (map type f a)
+func MAP(node Node) ast.Expr {
+	var elementIdent = ast.NewIdent("[]" + node.Nodes[0].Atom)
+	var funcIdent = node.Nodes[1].Ident()
+	var valuesIdent = node.Nodes[2].Ident()
+
+	return &ast.CallExpr{
+		Fun: &ast.FuncLit{
+			Type: &ast.FuncType{
+				Params: &ast.FieldList{List: []*ast.Field{
+					&ast.Field{
+						Names: []*ast.Ident{ast.NewIdent("values")},
+						Type:  elementIdent,
+					},
+				}},
+				Results: &ast.FieldList{List: []*ast.Field{
+					&ast.Field{
+						Type: elementIdent,
+					},
+				}},
+			},
+			Body: &ast.BlockStmt{
+				List: []ast.Stmt{
+					&ast.AssignStmt{
+						Tok: token.DEFINE,
+						Lhs: []ast.Expr{
+							ast.NewIdent("newValues"),
+						},
+						Rhs: []ast.Expr{
+							ast.NewIdent("make([]" + node.Nodes[0].Atom + ", len(values))"),
+						},
+					},
+					&ast.RangeStmt{
+						Key: ast.NewIdent("i"),
+						Tok: token.DEFINE,
+						X:   ast.NewIdent("values"),
+						Body: &ast.BlockStmt{
+							List: []ast.Stmt{
+								&ast.AssignStmt{
+									Tok: token.ASSIGN,
+									Lhs: []ast.Expr{
+										ast.NewIdent("newValues[i]"),
+									},
+									Rhs: []ast.Expr{
+										&ast.CallExpr{
+											Fun: funcIdent,
+											Args: []ast.Expr{
+												ast.NewIdent("values[i]"),
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					&ast.ReturnStmt{Results: []ast.Expr{ast.NewIdent("newValues")}},
+				},
+			},
+		},
+		Args: []ast.Expr{valuesIdent},
+	}
+}
