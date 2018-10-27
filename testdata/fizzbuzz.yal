@@ -15,4 +15,4 @@
     (return "Fizz"))
   (if (== (% n 5) 0)
     (return "Buzz"))
-  (return (strconv.Itoa n)))
+  (strconv.Itoa n))

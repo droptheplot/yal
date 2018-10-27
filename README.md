@@ -27,7 +27,7 @@ go build
   (fmt.Println (mul 2 3)))
 
 (func mul ((a int) (b int)) (int)
-  (return (* a b)))
+  (* a b))
 ```
 
 **output.go**
@@ -42,7 +42,7 @@ func main() {
 }
 
 func mul(a int, b int) int {
-  return(a * b)
+  return a * b
 }
 ```
 

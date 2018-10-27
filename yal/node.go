@@ -69,17 +69,26 @@ func (node Node) File() *ast.File {
 }
 
 func (node Node) Func() ast.Decl {
+	var params = node.Nodes[1].FieldList()
+	var results = node.Nodes[2].FieldList()
 	var bodyList []ast.Stmt
 
-	for _, n := range node.Nodes[3:] {
-		bodyList = append(bodyList, n.Stmt())
+	if len(results.List) > 0 {
+		for _, n := range node.Nodes[3 : len(node.Nodes)-1] {
+			bodyList = append(bodyList, n.Stmt())
+		}
+		bodyList = append(bodyList, node.Nodes[len(node.Nodes)-1].Return())
+	} else {
+		for _, n := range node.Nodes[3:] {
+			bodyList = append(bodyList, n.Stmt())
+		}
 	}
 
 	result := &ast.FuncDecl{
 		Name: ast.NewIdent(node.Nodes[0].Atom),
 		Type: &ast.FuncType{
-			Params:  node.Nodes[1].FieldList(),
-			Results: node.Nodes[2].FieldList(),
+			Params:  params,
+			Results: results,
 		},
 		Body: &ast.BlockStmt{
 			List: bodyList,
@@ -151,4 +160,12 @@ func (node Node) Expr() ast.Expr {
 
 func (node Node) Ident() *ast.Ident {
 	return ast.NewIdent(node.Atom)
+}
+
+func (node Node) Return() ast.Stmt {
+	return &ast.ReturnStmt{
+		Results: []ast.Expr{
+			node.Expr(),
+		},
+	}
 }
