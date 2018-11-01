@@ -176,13 +176,16 @@ func ARRAY(node Node) ast.Expr {
 }
 
 // MAP generates anonymous function which applies function `f` to each element
-// in slice `a` of type `type` and returns new slice.
-// Function `f` should have one argument and one return value with same type as `type`.
-//  (map type f a)
+// in slice `a` and returns new slice. Function `f` should have one argument
+// and return value with same type.
+//  (map type type f a)
 func MAP(node Node) ast.Expr {
-	var elementIdent = ast.NewIdent("[]" + node.Nodes[0].Atom)
-	var funcIdent = node.Nodes[1].Ident()
-	var valuesExpr = node.Nodes[2].Expr()
+	var (
+		inputIdent  = node.Nodes[0].Ident()
+		outputIdent = node.Nodes[1].Ident()
+		funcIdent   = node.Nodes[2].Ident()
+		valuesExpr  = node.Nodes[3].Expr()
+	)
 
 	return &ast.CallExpr{
 		Fun: &ast.FuncLit{
@@ -190,12 +193,12 @@ func MAP(node Node) ast.Expr {
 				Params: &ast.FieldList{List: []*ast.Field{
 					&ast.Field{
 						Names: []*ast.Ident{ast.NewIdent("values")},
-						Type:  elementIdent,
+						Type:  inputIdent,
 					},
 				}},
 				Results: &ast.FieldList{List: []*ast.Field{
 					&ast.Field{
-						Type: elementIdent,
+						Type: outputIdent,
 					},
 				}},
 			},
@@ -207,7 +210,7 @@ func MAP(node Node) ast.Expr {
 							ast.NewIdent("newValues"),
 						},
 						Rhs: []ast.Expr{
-							ast.NewIdent("make([]" + node.Nodes[0].Atom + ", len(values))"),
+							ast.NewIdent("make(" + node.Nodes[1].Atom + ", len(values))"),
 						},
 					},
 					&ast.RangeStmt{
