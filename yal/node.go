@@ -41,11 +41,6 @@ func (node Node) isImport() bool {
 func (node Node) File() *ast.File {
 	var name *ast.Ident
 	var decls []ast.Decl
-	var specs []ast.Spec
-
-	imports := &ast.GenDecl{Tok: token.IMPORT, Specs: specs}
-
-	decls = append(decls, imports)
 
 	for i := range node.Nodes {
 		if node.Nodes[i].isFunc() {
@@ -53,7 +48,7 @@ func (node Node) File() *ast.File {
 		} else if node.Nodes[i].isPackage() {
 			name = ast.NewIdent(node.Nodes[i].Nodes[0].Atom)
 		} else if node.Nodes[i].isImport() {
-			imports.Specs = append(imports.Specs, node.Nodes[i].Import())
+			decls = append(decls, node.Nodes[i].Imports())
 		}
 	}
 
@@ -124,9 +119,19 @@ func (node Node) Import() *ast.ImportSpec {
 	return &ast.ImportSpec{
 		Path: &ast.BasicLit{
 			Kind:  token.STRING,
-			Value: node.Nodes[0].Atom,
+			Value: node.Atom,
 		},
 	}
+}
+
+func (node Node) Imports() *ast.GenDecl {
+	var specs []ast.Spec
+
+	for i := range node.Nodes {
+		specs = append(specs, node.Nodes[i].Import())
+	}
+
+	return &ast.GenDecl{Tok: token.IMPORT, Specs: specs}
 }
 
 func (node Node) Stmt() ast.Stmt {
