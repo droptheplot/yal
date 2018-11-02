@@ -1,12 +1,8 @@
 package main
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
-	"go/ast"
-	"go/printer"
-	"go/token"
 	"io/ioutil"
 	"os"
 
@@ -26,17 +22,21 @@ func main() {
 		os.Exit(1)
 	}
 
-	src, _ := ioutil.ReadFile(path)
+	src, err := ioutil.ReadFile(path)
+
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
 	file := yal.New(&tokenizer.Tokenizer{}, &parser.Parser{}).Run(src)
 
-	PrintFile(file)
-}
+	buf, err := yal.Buffer(file)
 
-func PrintFile(file *ast.File) {
-	buffer := &bytes.Buffer{}
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
-	printer.Fprint(buffer, token.NewFileSet(), file)
-
-	fmt.Println(buffer)
+	fmt.Print(buf)
 }

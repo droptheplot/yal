@@ -1,7 +1,10 @@
 package yal
 
 import (
+	"bytes"
 	"go/ast"
+	"go/printer"
+	"go/token"
 )
 
 type Tokenizer interface {
@@ -63,4 +66,16 @@ func (y *Yal) Run(src []byte) *ast.File {
 	file := node.File()
 
 	return file
+}
+
+func Buffer(file *ast.File) (*bytes.Buffer, error) {
+	buffer := &bytes.Buffer{}
+
+	err := printer.Fprint(buffer, token.NewFileSet(), file)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return buffer, nil
 }
