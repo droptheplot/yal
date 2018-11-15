@@ -2,14 +2,16 @@ package testdata
 
 import "strconv"
 
-func FizzBuzz(n int, end int, res *[]string) {
-	if n == end+1 {
-		return
-	}
-	*res = append(*res, stringer(n))
-	FizzBuzz(n+1, end, res)
+func FizzBuzz(numbers []int) []string {
+	return func(values []int) []string {
+		newValues := make([]string, len(values))
+		for i := range values {
+			newValues[i] = toFizzBuzz(values[i])
+		}
+		return newValues
+	}(numbers)
 }
-func stringer(n int) string {
+func toFizzBuzz(n int) string {
 	if n%3 == 0 && n%5 == 0 {
 		return "FizzBuzz"
 	}
@@ -21,4 +23,3 @@ func stringer(n int) string {
 	}
 	return strconv.Itoa(n)
 }
-
